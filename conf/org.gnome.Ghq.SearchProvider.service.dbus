@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.gnome.Ghq.SearchProvider
+Exec=/usr/lib/ghq-search-provider/ghq-search-provider.py
+SystemdService=org.gnome.Ghq.SearchProvider.service

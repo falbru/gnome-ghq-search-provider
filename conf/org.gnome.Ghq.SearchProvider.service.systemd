@@ -1,0 +1,7 @@
+[Unit]
+Description=Ghq search provider for GNOME Shell daemon
+
+[Service]
+Type=dbus
+BusName=org.gnome.Ghq.SearchProvider
+ExecStart=/usr/lib/ghq-search-provider/ghq-search-provider.py
