@@ -7,6 +7,8 @@ import sys
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GLib
 
+import subprocess
+
 SBN = dict(dbus_interface="org.gnome.Shell.SearchProvider2")
 
 class GhqSearchProvider(dbus.service.Object):
@@ -21,10 +23,17 @@ class GhqSearchProvider(dbus.service.Object):
 
     @dbus.service.method(in_signature="as", out_signature="as", **SBN)
     def GetInitialResultSet(self, terms):
-        if "hello" in terms:
-            self.results = {"1": "Hello World"}
-            return ["1"]
-        return []
+        output = subprocess.run(["ghq", "list"], capture_output=True, text=True).stdout
+        repos = output.split("\n")[:-1]
+        filenames = [repo.split('/')[-1] for repo in repos]
+
+        out = []
+        self.results = {}
+        for term in terms:
+            if term in filenames:
+                self.results[term] = repos[filenames.index(term)]
+                out.append(term)
+        return out
 
     @dbus.service.method(in_signature="asas", out_signature="as", **SBN)
     def GetSubsearchResultSet(self, previous_results, new_terms):
@@ -37,8 +46,8 @@ class GhqSearchProvider(dbus.service.Object):
             if id in self.results:
                 metas.append({
                     'id': id,
-                    'name': self.results[id],
-                    'description': "A simple Hello World result",
+                    'name': id,
+                    'description': self.results[id],
                     'gicon': "utilities-terminal"
                 })
         return metas
