@@ -29,10 +29,15 @@ class GhqSearchProvider(dbus.service.Object):
 
         out = []
         self.results = {}
-        for term in terms:
-            if term in filenames:
-                self.results[term] = repos[filenames.index(term)]
-                out.append(term)
+        for i, filename in enumerate(filenames):
+            for term in terms:
+                if term in filename:
+                    id = str(i)
+                    self.results[id] = {
+                        "name": filename,
+                        "repo": repos[i]
+                    }
+                    out.append(id)
         return out
 
     @dbus.service.method(in_signature="asas", out_signature="as", **SBN)
@@ -46,9 +51,8 @@ class GhqSearchProvider(dbus.service.Object):
             if id in self.results:
                 metas.append({
                     'id': id,
-                    'name': id,
-                    'description': self.results[id],
-                    'gicon': "utilities-terminal"
+                    'name': self.results[id]["name"],
+                    'description': self.results[id]["repo"],
                 })
         return metas
 
