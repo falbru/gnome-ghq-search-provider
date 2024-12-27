@@ -58,11 +58,12 @@ class GhqSearchProvider(dbus.service.Object):
 
     @dbus.service.method(in_signature="sasu", **SBN)
     def ActivateResult(self, id, terms, timestamp):
-        print(f"Activated result: {self.results.get(id, 'Unknown')}")
+        project = self.results.get(id)
+        subprocess.Popen(["k"], cwd="/home/falk/ghq/" + project["repo"])
 
     @dbus.service.method(in_signature="asu", terms="as", timestamp="u", **SBN)
     def LaunchSearch(self, terms, timestamp):
-        print("Search launched with:", terms)
+        pass
 
 if __name__ == "__main__":
     DBusGMainLoop(set_as_default=True)
