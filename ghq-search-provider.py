@@ -18,6 +18,9 @@ class GhqSearchProvider(dbus.service.Object):
     def __init__(self):
         self.results = {}
         self.session_bus = dbus.SessionBus()
+
+        self.ghq_root = subprocess.run(["ghq", "root"], capture_output=True, text=True, check=True).stdout.strip()
+
         bus_name = dbus.service.BusName(self.bus_name, bus=self.session_bus)
         dbus.service.Object.__init__(self, bus_name, self._object_path)
 
@@ -59,7 +62,8 @@ class GhqSearchProvider(dbus.service.Object):
     @dbus.service.method(in_signature="sasu", **SBN)
     def ActivateResult(self, id, terms, timestamp):
         project = self.results.get(id)
-        subprocess.Popen(["k"], cwd="/home/falk/ghq/" + project["repo"])
+        work_directory = self.ghq_root + "/" + project["repo"]
+        subprocess.Popen(["k"], cwd=work_directory)
 
     @dbus.service.method(in_signature="asu", terms="as", timestamp="u", **SBN)
     def LaunchSearch(self, terms, timestamp):
